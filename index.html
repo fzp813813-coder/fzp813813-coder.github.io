@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>候选人简历分析面板</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f3f4f6; color: #1f2937; line-height:1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+.header { text-align: center; padding: 32px 0 24px; }
+.header h1 { font-size: 28px; color: #1e3a5f; }
+.header p { color: #6b7280; margin-top: 4px; font-size: 14px; }
+.filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.filter-bar input { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; outline: none; }
+.filter-bar input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,.2); }
+.filter-bar select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; background: #fff; outline: none; cursor: pointer; }
+.filter-bar select:focus { border-color: #3b82f6; }
+.candidate-card { transition: box-shadow .2s; }
+.candidate-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+@media print {
+    body { background: #fff; }
+    .filter-bar { display: none; }
+    .candidate-card { break-inside: avoid; box-shadow: none; border: 1px solid #e5e7eb; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>候选人简历分析面板</h1>
+        <p>共 8 位候选人 · 生成于 dashboard</p>
+    </div>
+
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="搜索姓名、技能、公司..." oninput="filterCards()">
+        <select id="statusFilter" onchange="filterCards()">
+            <option value="">全部状态</option>
+            <option value="在职">在职</option>
+            <option value="离职">离职</option>
+            <option value="应届">应届</option>
+        </select>
+        <select id="eduFilter" onchange="filterCards()">
+            <option value="">全部学历</option>
+            <option value="本科">本科</option>
+            <option value="硕士">硕士</option>
+            <option value="博士">博士</option>
+        </select>
+    </div>
+
+    
+    <div style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:24px">
+        <div style="padding:14px 20px;background:#1e3a5f;color:#fff;font-weight:600;font-size:16px">候选人总览</div>
+        <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:14px">
+                <thead>
+                    <tr style="background:#f9fafb;text-align:left">
+                        <th style="padding:10px 12px;border-bottom:2px solid #e5e7eb">姓名</th>
+                        <th style="padding:10px 12px;border-bottom:2px solid #e5e7eb">年龄</th>
+                        <th style="padding:10px 12px;border-bottom:2px solid #e5e7eb">学历</th>
+                        <th style="padding:10px 12px;border-bottom:2px solid #e5e7eb">语言能力</th>
+                        <th style="padding:10px 12px;border-bottom:2px solid #e5e7eb">工作经历</th>
+                        <th style="padding:10px 12px;border-bottom:2px solid #e5e7eb">状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">刘旗</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">24</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语CET-6（工作应用自如）, 普通话, 粤语</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">1段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#3b82f6;margin:2px">在职</span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">古璇</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">26</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语（商务洽谈）</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">1段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#6b7280;margin:2px">离职</span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">吕康</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">34</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语CET6</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">2段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#6b7280;margin:2px">离职</span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">李灿</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px"></span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">西班牙语（标注：海外销售西语岗位）</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">0段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#6b7280;margin:2px"></span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">范玉龙</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">37</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语（14年外贸英语应用经验）</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">3段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#3b82f6;margin:2px">在职</span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">董思哲</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">28</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">硕士</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语（工作语言）, 普通话</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">3段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#6b7280;margin:2px">应届</span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">邱睿</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">28</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">硕士</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语（商务洽谈）, 雅思7.0分</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">3段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#3b82f6;margin:2px">在职</span></td>
+        </tr>
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">魏煜泽</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">27</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px">英语专业八级（TEM-8）</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">2段</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#6b7280;margin:2px">离职</span></td>
+        </tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="cardsContainer">
+        
+    <div class="candidate-card" id="card-0" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="刘旗" data-status="在职" data-edu="本科">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">刘旗</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#3b82f6;margin:2px">在职</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">24</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">本科</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">籍贯</span><span style="font-weight:500">湖南</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">现居</span><span style="font-weight:500">长沙</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">婚姻</span><span style="font-weight:500">单身</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语CET-6（工作应用自如）</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">普通话</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">粤语</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="0" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="0" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="0" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">项目经历</button>
+        <button class="tab-btn" data-card="0" data-tab="3" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="0" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">了解产品管理的基本IPD开发流程，以产品年为周期为产品的生命负责</li>
+<li style="margin-bottom:4px;line-height:1.5">通过英语四六级，听说流利，可以与海外客户或同事顺畅沟通</li>
+<li style="margin-bottom:4px;line-height:1.5">有过海外市场的一线调研经验以及市场活动举办经验，从客户角度出发研究产品与市场的匹配度</li>
+<li style="margin-bottom:4px;line-height:1.5">有一定的海外员工管理经验，分管过印度、越南、澳大利亚本地员工并进行日常的工作推进</li></ul></div><div class="tab-content" data-card="0" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">中联重科</span>
+                <span style="font-size:12px;color:#6b7280">2023/07-至今</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">区域产品及运营经理 / 区域经理 / 澳洲区域销售经理 | 长沙 / 南亚 / 澳大利亚</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>在南亚大区担任区域经理，完成了对孟加拉、尼泊尔的市场和产品调研</li>
+<li>在尼泊尔成功举办南亚经销商大会，协助开发尼泊尔市场，签下近百台订单</li>
+<li>远程管理印度本地员工，一年半帮助印度市场从个位数增长到近300台设备</li>
+<li>在中联重科农机海外板块担任产品经理，主导伊朗6公斤喂入量水稻机立项到产品测试</li>
+<li>主导马来西亚市场调研并输出完整工作报告</li>
+<li>全球经销商大会上向外国客户介绍水田产品，帮助累计签下100+水稻机订单</li>
+<li>在澳大利亚担任业务经理，成功导入首台混动大马力拖拉机本地化测试，初步搭建本地化服务支持团队</li></ul>
+        </div></div><div class="tab-content" data-card="0" data-tab="2" style="display:none;margin-top:12px">
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">澳大利亚首台大马力混动拖拉机测试导入</span>
+                <span style="font-size:12px;color:#6b7280">2025/08-至今</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">主导策划并实施了澳大利亚市场首款大马力混合动力拖拉机的全流程导入测试。从零建立当地合作伙伴网络，主导技术协议和商务合同谈判，组织为期三个月的实地测试验证，累计完成近百小时不同工况下的性能数据采集和分析。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">印度水稻机市场导入</span>
+                <span style="font-size:12px;color:#6b7280">2024/05-2025/10</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">负责印度区域水田机械产品全面管理，一年半内将水稻机销量从个位数提升至近300台。建立双轨制渠道管理体系，策划高转化营销活动，在尼泊尔和印度边境开展经销商大会，现场签署首批订单达50余台。</div>
+        </div></div><div class="tab-content" data-card="0" data-tab="3" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">湖南农业大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2019/09-2023/06</span>
+            <div style="font-size:13px;color:#4b5563">本科 · 机械电子工程</div>
+        </div></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-1" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="古璇" data-status="离职" data-edu="本科">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">古璇</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#ef4444;margin:2px">离职</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">26</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">本科</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">籍贯</span><span style="font-weight:500">湖北-武汉</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">现居</span><span style="font-weight:500">江苏-常州</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">婚姻</span><span style="font-weight:500">已婚未育</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语（商务洽谈）</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="1" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="1" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="1" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">项目经历</button>
+        <button class="tab-btn" data-card="1" data-tab="3" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="1" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">海外经验丰富，适配驻外要求：有常驻马来西亚、印尼的驻外经历，深耕东南亚市场，熟悉当地商务规则与外贸流程</li>
+<li style="margin-bottom:4px;line-height:1.5">业务与综合能力扎实：擅长客户开发、项目谈判，操盘过多项大型农牧设备项目，兼具外语、制图、报价及跨部门协作能力</li>
+<li style="margin-bottom:4px;line-height:1.5">岗位适配度高，到岗效率快：具备农牧机械专业功底，深耕海外设备销售，可随时到岗</li></ul></div><div class="tab-content" data-card="1" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">江苏正昌粮机股份有限公司</span>
+                <span style="font-size:12px;color:#6b7280">2022/06-2026/03 (3年10个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">马来西亚/印尼市场销售经理 | 马来西亚 / 印尼</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>全面承接马来西亚、印尼区域饲料加工设备和粮食仓储设备的年度销售指标</li>
+<li>负责海外客户开发、对接与深度维护，建立稳定客户关系网络</li>
+<li>深度参与国内外行业展会（VIV Asia、VICTAM等），挖掘海外商机</li>
+<li>频繁出差马来西亚、印尼，熟悉当地市场环境与商务规则</li></ul>
+        </div></div><div class="tab-content" data-card="1" data-tab="2" style="display:none;margin-top:12px">
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">新建美国10tph畜禽饲料厂项目</span>
+                
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">负责项目前期客户接待、需求调研与技术沟通，主导项目询价、成本核算与报价工作，独立完成项目工艺流程图绘制与技术文件整理。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">新建印尼1000kg预混料饲料厂项目</span>
+                
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">参与客户现场考察与技术对接，优化项目工艺方案，负责项目报价、成本管控与商务条款梳理，最终促成项目合同签订，合同金额300万元。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">新建马来2×20tph+4×2000t畜禽饲料厂与配套筒仓项目</span>
+                
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">主导客户全流程对接，制定针对性的整线设备解决方案，主持项目合同细节谈判，合同金额达2000万元。</div>
+        </div></div><div class="tab-content" data-card="1" data-tab="3" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">武汉轻工大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2018/09-2022/06</span>
+            <div style="font-size:13px;color:#4b5563">本科(统招) · 食品科学与工程</div>
+        </div></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-2" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="吕康" data-status="离职" data-edu="本科">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">吕康</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#ef4444;margin:2px">离职</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">34</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">本科</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">籍贯</span><span style="font-weight:500">山东-潍坊</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">现居</span><span style="font-weight:500">泰国</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">婚姻</span><span style="font-weight:500">已婚未育</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语CET6</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="2" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="2" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="2" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="2" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">海外经验丰富，适配驻外要求：常驻过赞比亚、泰国两地，深耕拖拉机、播种机等农机业务，手握泰国本地客户资源</li>
+<li style="margin-bottom:4px;line-height:1.5">业务与综合能力扎实：兼具渠道经销、终端直销双模式实操，过往业绩稳定；英语CET6，精通CAD、办公软件，懂国贸财会</li>
+<li style="margin-bottom:4px;line-height:1.5">岗位适配度高，到岗效率快：财会国贸+计算机复合学历，长期深耕海外设备销售，开拓抗压能力强</li></ul></div><div class="tab-content" data-card="2" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">潍坊英博机械设备有限公司</span>
+                <span style="font-size:12px;color:#6b7280">2022/12-2026/06 (3年7个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">销售经理 | 泰国</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>作为公司在泰国市场的唯一销售代表，全面负责当地市场开拓与老客户维护</li>
+<li>主导从零组建泰国办事处，完成公司注册、税务登记、签证申请、办公场地租赁及人员招聘等全套手续</li>
+<li>成功拿下泰国CP集团与Eastern Grand C集团大额订单，总金额突破2000万元，年销售额增长超300%</li>
+<li>老客户续单率达95%以上，开发新增优质客户12家</li>
+<li>年平均业绩超过1000万</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">Passony Zambia Limited</span>
+                <span style="font-size:12px;color:#6b7280">2014/03-2022/04 (8年2个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">赞比亚事业部销售经理 | 赞比亚</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>全面负责公司在赞比亚市场的销售战略落地、客户拓展与竞品调研</li>
+<li>对接中铁、中建等在非国企/央企的项目部采购与决策层，主导商务谈判</li>
+<li>成功打入中建/中铁等核心央企的非洲项目供应链库，年采购额超过500万元</li>
+<li>独立开拓3家当地知名经销商，构建覆盖赞比亚主要城市的销售分销网络</li>
+<li>连续2年超额完成海外销售指标，个人业绩常年位居部门前3</li>
+<li>年平均业绩300万美金</li></ul>
+        </div></div><div class="tab-content" data-card="2" data-tab="2" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">山东理工大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2020/09-2025/01</span>
+            <div style="font-size:13px;color:#4b5563">本科(非统招有双证) · 计算机科学与技术</div>
+        </div>
+
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">青岛大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2010/09-2014/06</span>
+            <div style="font-size:13px;color:#4b5563">本科(统招肄业) · 会计学, 国际经济与贸易</div>
+        </div></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-3" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="李灿" data-status="" data-edu="">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">李灿</h3>
+                <div></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">西班牙语（标注：海外销售西语岗位）</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="3" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="3" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">⚠️ PDF无法提取文本（可能为扫描件或图片型PDF），请手动查看原文件</li></ul></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-4" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="范玉龙" data-status="在职" data-edu="本科">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">范玉龙</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#3b82f6;margin:2px">在职</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">37</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">本科</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">籍贯</span><span style="font-weight:500">浙江</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">现居</span><span style="font-weight:500">浙江-宁波</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">婚姻</span><span style="font-weight:500">已婚</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语（14年外贸英语应用经验）</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="4" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="4" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="4" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">项目经历</button>
+        <button class="tab-btn" data-card="4" data-tab="3" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="4" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">14年外贸工作经验，一直负责欧美、北美等市场，熟悉国际贸易知识和流程，深入了解北美地区认证及市场准入要求</li>
+<li style="margin-bottom:4px;line-height:1.5">在宁波恒达高智能科技担任外贸商务主管，带领3人团队，预计2025年可达1.2亿人民币</li>
+<li style="margin-bottom:4px;line-height:1.5">在宁波某塑料色选机械厂做外贸代理以来，TOC客户开拓全世界客户，年销售额达近2000万人民币</li></ul></div><div class="tab-content" data-card="4" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">宁波某塑料色选机械厂</span>
+                <span style="font-size:12px;color:#6b7280">2025/05-至今 (1年)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">外贸业务代理 | 浙江-宁波</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>负责客户业务开发与日常维护，处理询价、报价、新品开发、订单等</li>
+<li>通过网络B2B账号、社媒拓客，0-1获得TOC客户，100%新开发</li>
+<li>年销售额近2000万人民币</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">宁波恒达高智能科技股份有限公司</span>
+                <span style="font-size:12px;color:#6b7280">2014/06-2025/05 (10年11个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">外贸商务主管 | 浙江-宁波</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>负责客户业务开发与日常维护，处理询价、报价、新品开发、订单等</li>
+<li>跟进客户产品开发及特殊合同评审，客户和市场风险把控</li>
+<li>负责各项销售指标的整理和统计，年销售额1.2亿人民币</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">宁波科曼电子科技有限公司</span>
+                <span style="font-size:12px;color:#6b7280">2012/07-2014/05 (1年10个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">外贸业务员 | 浙江-宁波</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>日本、澳洲以及欧洲客户的销售及维护工作，负责消费电子、拖线板、墙壁开关插座Wifi类产品销售</li></ul>
+        </div></div><div class="tab-content" data-card="4" data-tab="2" style="display:none;margin-top:12px">
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">GE, Honeywell, Philips等系列项目开发</span>
+                <span style="font-size:12px;color:#6b7280">2016/04-2025/05</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">主导负责GE、Honeywell、Philips等OEM定时器系列项目的产品开发沟通及全程跟进。熟悉北美市场HomeDepot、Wal-Mart、Lowes等大商超流程。2019年出货量超过1000万美金。</div>
+        </div></div><div class="tab-content" data-card="4" data-tab="3" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">温州大学城市学院</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2008/09-2012/07</span>
+            <div style="font-size:13px;color:#4b5563">本科 · 国际经济与贸易</div>
+        </div></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-5" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="董思哲" data-status="应届" data-edu="硕士">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">董思哲</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#10b981;margin:2px">应届</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">硕士</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">28</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">硕士</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语（工作语言）</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">普通话</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="5" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="5" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="5" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">项目经历</button>
+        <button class="tab-btn" data-card="5" data-tab="3" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="5" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">计算机科学本科与信息系统硕士背景，拥有欧洲及澳洲多年海外学习、生活和工作经历</li>
+<li style="margin-bottom:4px;line-height:1.5">英语可作为工作语言，能够适应海外出差、外派及跨文化商务沟通环境</li>
+<li style="margin-bottom:4px;line-height:1.5">曾参与海外展会客户接待、产品介绍及意向客户跟进，具备客户需求分析、关系维护和销售支持经验</li>
+<li style="margin-bottom:4px;line-height:1.5">具备IT、数据管理和数字化产品理解能力，能够快速学习新产品与新市场</li>
+<li style="margin-bottom:4px;line-height:1.5">有客户服务全流程经验，包括需求沟通、方案讲解、行程安排协调及现场问题处理</li></ul></div><div class="tab-content" data-card="5" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">LOK Holiday Pty Ltd</span>
+                <span style="font-size:12px;color:#6b7280">2025/10-2026/05</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">旅行定制规划师/导游 | 澳大利亚</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>面向国际客户提供中英文服务，负责客户需求沟通、服务方案讲解、行程安排协调及现场问题处理</li>
+<li>协调客户、车辆、餐厅、景区及合作方等多方资源</li>
+<li>主动收集客户反馈，识别不同客户群体的消费偏好和潜在需求</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">Rhodes College</span>
+                <span style="font-size:12px;color:#6b7280">2025/07-2025/10</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">IT技术支持 | 美国</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>掌握全流程软件开发与软件工程方法</li>
+<li>熟悉网络、数据库、系统、安全等ICT全栈知识</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">西安尚艺书画培训中心</span>
+                <span style="font-size:12px;color:#6b7280">2022/03-2025/07</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">IT技术支持 | 西安</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>对接200+名学生客户及5名内部员工，响应ICT相关咨询与服务需求</li>
+<li>负责员工数字工具培训及宣传素材制作，使用Adobe Photoshop设计100+份宣传物料</li>
+<li>管理10-20个Excel工作簿，精准记录客户信息与服务需求</li></ul>
+        </div></div><div class="tab-content" data-card="5" data-tab="2" style="display:none;margin-top:12px">
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">中国山东品牌产品中东欧展览会</span>
+                <span style="font-size:12px;color:#6b7280">2022.06</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">担任展台负责人。负责3个展位布置、产品介绍、客户接待和现场咨询解答。全程接待50+名海外客户，获得5名意向客户，积累了B2B客户沟通、产品推介和海外市场销售经验。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">全匈学联撤侨协调行动</span>
+                <span style="font-size:12px;color:#6b7280">2022.03</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">在中国驻匈牙利大使馆统一协调下，参与俄乌战争期间中国公民接待、安置和撤离支持工作。负责人员登记、需求对接、物资协调和信息传达，保障300余名中国公民安全撤离与安置。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">全匈学联新媒体部</span>
+                <span style="font-size:12px;color:#6b7280">2018.05-2022.02</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">担任新媒体部部长。领导团队开展社交媒体运营、活动宣传和内容制作，每年推广3场以上文化活动。通过针对性宣传策略，实现微信公众号关注人数增长3000+。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">ERP与客户支持解决方案项目</span>
+                <span style="font-size:12px;color:#6b7280">2023.03-2023.06</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">墨尔本大学项目。围绕企业运营和客户服务场景，设计CRM/ERP支持方案，覆盖客户信息、产品资料、订单记录、服务跟进和知识库管理等模块。强化了业务流程理解、客户数据管理、解决方案表达和跨部门协作意识。</div>
+        </div></div><div class="tab-content" data-card="5" data-tab="3" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">墨尔本大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2022-2024</span>
+            <div style="font-size:13px;color:#4b5563">硕士 · 信息系统</div>
+        </div>
+
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">布达佩斯技术与经济大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2016-2022</span>
+            <div style="font-size:13px;color:#4b5563">本科 · 计算机科学（软件工程）</div>
+        </div></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-6" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="邱睿" data-status="在职" data-edu="硕士">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">邱睿</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#3b82f6;margin:2px">在职</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">硕士</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">28</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">硕士</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">籍贯</span><span style="font-weight:500">广州</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">现居</span><span style="font-weight:500">英国</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">婚姻</span><span style="font-weight:500">未婚未育</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语（商务洽谈）</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">雅思7.0分</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="6" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="6" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="6" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">项目经历</button>
+        <button class="tab-btn" data-card="6" data-tab="3" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="6" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">沟通能力、快速学习能力、统筹与策划、数据敏感性突出</li>
+<li style="margin-bottom:4px;line-height:1.5">喜欢接受新事物和迎接挑战，在挑战中获得学习新知识的快感</li>
+<li style="margin-bottom:4px;line-height:1.5">热爱交流和语言的艺术，喜欢结识不同层次的人群</li>
+<li style="margin-bottom:4px;line-height:1.5">具备产品营销与数字化双重能力：主导AWP产品线在英国市场的整体营销</li>
+<li style="margin-bottom:4px;line-height:1.5">推动营销数字化：开发内部Python选配与核价工具，提高销售效率和准确性</li></ul></div><div class="tab-content" data-card="6" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">LiuGong UK Direct（柳工英国）</span>
+                <span style="font-size:12px;color:#6b7280">2023/08-至今</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">英国驻外产品营销经理 | 英国</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>负责高空作业平台（AWP）、叉装车和叉车产品线在英国市场的整体营销、直销及市场拓展</li>
+<li>主导英国区域市场策略制定、潜在客户开发、竞品分析与价格策略规划</li>
+<li>组织公司在英国的核心营销活动，包括Vertikal Days展会，负责全流程筹备</li>
+<li>独立负责展会期间所有中英双语宣传文案、产品亮点描述、媒体素材输出</li>
+<li>推动营销数字化：将业务规则、选配逻辑与报价体系标准化、程序化</li>
+<li>AWP产品线月均销售10台，月均销售额约£600,000</li>
+<li>2025年AWP销售量106台，总计销售额£731,400（折合人民币6,728,880元）</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">尼康映像仪器销售(中国)有限公司广州分公司</span>
+                <span style="font-size:12px;color:#6b7280">2023/02-2023/08</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">专业市场支持 | 广州</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>负责华中、华南地区各影楼、电视台、报社等单位的客户关系维护</li>
+<li>入职后第三个月开始连续两月超业绩110%，新开拓B端客户3个</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">上海德邦物流</span>
+                <span style="font-size:12px;color:#6b7280">2022/03-2023/01</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">管培生（实习） | 上海</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>监控载具闲置率保持低于10%，业绩评判：优秀</li>
+<li>监控一线载具使用人员每日在职效率控制在75%以上</li>
+<li>载具设备吨成本控制：成本/货量＜34</li></ul>
+        </div></div><div class="tab-content" data-card="6" data-tab="2" style="display:none;margin-top:12px">
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">海外子公司AI数字化运营体系建设</span>
+                <span style="font-size:12px;color:#6b7280">2025/10-至今</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">主导英国子公司数字化运营体系规划与建设，推动AI技术与业务场景结合。建立AI业务情报平台（邮件智能检索、业务摘要生成）、销售报价管理系统、销售与库存可视化管理平台。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">英国市场新产品调研与立项研发</span>
+                <span style="font-size:12px;color:#6b7280">2024/11-至今</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">采用SWOT、PESTEL、BCG Matrix、波特五力模型等分析模型，结合客户访谈数据，系统评估目标产品在英国市场的可行性。产出完整市场调研报告，成功推动新产品研发立项。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">英国高工作业平台机械广告营销项目</span>
+                <span style="font-size:12px;color:#6b7280">2024/10-至今</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">主导柳工AWP在英国市场的户外广告投放项目。制定详细项目方案（预算£23,640），选择皇家码头路、希思罗机场A30等高流量区域投放，与国际产品部及当地广告公司密切合作推动项目落地。</div>
+        </div></div><div class="tab-content" data-card="6" data-tab="3" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">卡迪夫大学（罗素联盟）</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2020/10-2022/03</span>
+            <div style="font-size:13px;color:#4b5563">硕士 · Business Strategy and Entrepreneurship</div>
+        </div>
+
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">江苏科技大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2016/09-2020/06</span>
+            <div style="font-size:13px;color:#4b5563">本科 · 工商管理</div>
+        </div></div></div>
+        </div>
+    </div>
+
+    <div class="candidate-card" id="card-7" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px" data-name="魏煜泽" data-status="离职" data-edu="本科">
+        <div style="padding:18px 20px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0;font-size:18px">魏煜泽</h3>
+                <div><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#ef4444;margin:2px">离职</span> <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#8b5cf6;margin:2px">本科</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:13px;opacity:.85">
+                <div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">年龄</span><span style="font-weight:500">27</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">性别</span><span style="font-weight:500">男</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">学历</span><span style="font-weight:500">本科</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">籍贯</span><span style="font-weight:500">陕西-渭南</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">现居</span><span style="font-weight:500">陕西-西安</span></div>
+<div style="display:flex;gap:8px;padding:3px 0"><span style="color:#6b7280;min-width:32px">婚姻</span><span style="font-weight:500">未婚</span></div>
+            </div>
+            <div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;color:#fff;background:#14b8a6;margin:2px">英语专业八级（TEM-8）</span></div>
+        </div>
+        <div style="padding:16px 20px">
+            <div class="tab-buttons" style="margin-bottom:4px">
+        <button class="tab-btn" data-card="7" data-tab="0" style="padding:6px 14px;border:none;background:#3b82f6;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">优势亮点</button>
+        <button class="tab-btn" data-card="7" data-tab="1" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">工作经历</button>
+        <button class="tab-btn" data-card="7" data-tab="2" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">项目经历</button>
+        <button class="tab-btn" data-card="7" data-tab="3" style="padding:6px 14px;border:none;background:#e5e7eb;color:#374151;border-radius:6px;cursor:pointer;font-size:13px;margin-right:4px">教育经历</button></div>
+            <div class="tab-contents"><div class="tab-content" data-card="7" data-tab="0" style="display:block;margin-top:12px"><ul style="padding-left:20px;margin:0"><li style="margin-bottom:4px;line-height:1.5">具备技术与销售双重背景，拥有5年海外市场（印度、埃及）一线经验</li>
+<li style="margin-bottom:4px;line-height:1.5">擅长以技术专业度驱动销售，具备0-1品牌搭建、渠道开拓及大型项目（百万美金级）的落地能力</li>
+<li style="margin-bottom:4px;line-height:1.5">熟悉海外市场准入认证体系（BIS认证、CCTV产品认证等）及合规管理流程</li>
+<li style="margin-bottom:4px;line-height:1.5">2023年负责区域核销率海外第一，获评海外营销中心最佳新人</li>
+<li style="margin-bottom:4px;line-height:1.5">英语专业八级（TEM-8）</li>
+<li style="margin-bottom:4px;line-height:1.5">核心能力：销售导向的售前支持 | 大客户项目攻坚 | 海外渠道开拓与管理 | 产品认证与合规管理 | 跨文化沟通协调</li></ul></div><div class="tab-content" data-card="7" data-tab="1" style="display:none;margin-top:12px">
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">宇视科技</span>
+                <span style="font-size:12px;color:#6b7280">2022/04-2025/12 (3年8个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">海外销售技术经理 | 印度 / 埃及</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>售前技术支持与销售转化：为销售及客户提供产品方案设计、选型配单支持</li>
+<li>主导印度UBI中央银行项目（110万美金）与埃及酵母工厂项目（12万美金）</li>
+<li>负责埃及、印度市场CCTV产品认证管理工作，确保出货产品符合当地法规</li>
+<li>负责一级代理团队的销售及技术赋能培训</li>
+<li>推动新品立项开发，定期进行友商竞品分析</li>
+<li>2023年埃及模拟产品核销率海外第一，2022年度海外营销中心最佳新人</li></ul>
+        </div>
+
+        <div style="background:#f9fafb;border-left:3px solid #3b82f6;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">海尔集团海外电器产业有限公司</span>
+                <span style="font-size:12px;color:#6b7280">2018/07-2021/05 (2年11个月)</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:2px">市场运营经理（海外市场方向） | 印度</div>
+            <ul style="margin:6px 0 0 0;padding-left:20px;font-size:13px;color:#4b5563"><li>0-1品牌搭建与市场上市：主导印度市场新品牌搭建，推动取得当地BEE认证，2021年3月成功在Amazon平台上市</li>
+<li>产品定价与价值链测算：通过竞品分析确定终端零售价及成本毛利，保证公司全年毛利率达17%</li>
+<li>TOB渠道谈判：针对两大渠道商制定差异化渠道策略</li>
+<li>主导印度全国3500余名直销员的招聘、管理及专业培训</li>
+<li>主导开发零售管理系统，实现3500+直销员及2800+门店的数据自动化管理，准确率提升至100%</li>
+<li>月均处理订单近百票，操作准确率近100%</li></ul>
+        </div></div><div class="tab-content" data-card="7" data-tab="2" style="display:none;margin-top:12px">
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">印度UBI中央银行项目</span>
+                <span style="font-size:12px;color:#6b7280">2024.01</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">作为项目销售及技术负责人，主导覆盖印度全国8600余支行及950余ATM机的大型监控项目，从需求沟通、方案设计到产品选型全流程跟进，实现项目总价值110万美金。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">埃及酵母工厂CCTV监控方案</span>
+                <span style="font-size:12px;color:#6b7280">2022.07</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">深入客户工厂实地了解需求，设计定制化监控方案，成功实现IPSAN产品在埃及市场的首次突破，项目总价值12万美元。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">INTERSC迪拜展</span>
+                <span style="font-size:12px;color:#6b7280">2023.01</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">担任展方销售及技术接口人，负责客户接待、产品方案讲解及意向客户建联，共转化有效线索60余条。</div>
+        </div>
+
+        <div style="background:#fefce8;border-left:3px solid #eab308;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span style="font-weight:600;color:#1f2937">为海尔印度零售终端建立系统工具</span>
+                <span style="font-size:12px;color:#6b7280">2020.05-2020.08</span>
+            </div>
+            <div style="font-size:13px;color:#4b5563;margin-top:4px">为解决3500+直销员及2800+门店的管理难题，牵头开发集考勤、销量、出样于一体的零售管理系统，显著提升管理效率与数据准确率至100%。</div>
+        </div></div><div class="tab-content" data-card="7" data-tab="3" style="display:none;margin-top:12px">
+        <div style="padding:6px 0;border-bottom:1px solid #f3f4f6">
+            <span style="font-weight:500">西安外国语大学</span>
+            <span style="color:#6b7280;font-size:12px;margin-left:8px">2014/09-2018/06</span>
+            <div style="font-size:13px;color:#4b5563">本科(统招) · 商务英语</div>
+        </div></div></div>
+        </div>
+    </div>
+    </div>
+
+    <div id="noResults" style="display:none;text-align:center;padding:40px;color:#9ca3af;font-size:16px">
+        没有匹配的候选人
+    </div>
+</div>
+
+<script>
+function filterCards() {
+    const search = (document.getElementById('searchInput').value || '').toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    const edu = document.getElementById('eduFilter').value;
+
+    const cards = document.querySelectorAll('.candidate-card');
+    let visible = 0;
+    cards.forEach(card => {
+        const name = (card.dataset.name || '').toLowerCase();
+        const text = (card.textContent || '').toLowerCase();
+        const cStatus = card.dataset.status || '';
+        const cEdu = card.dataset.edu || '';
+
+        const matchSearch = !search || name.includes(search) || text.includes(search);
+        const matchStatus = !status || cStatus === status;
+        const matchEdu = !edu || cEdu === edu;
+
+        if (matchSearch && matchStatus && matchEdu) {
+            card.style.display = '';
+            visible++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    document.getElementById('noResults').style.display = visible === 0 ? '' : 'none';
+}
+
+// Tab switching
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('tab-btn')) {
+        const cardId = e.target.dataset.card;
+        const tabId = e.target.dataset.tab;
+
+        // Update buttons
+        const buttons = document.querySelectorAll('.tab-btn[data-card="' + cardId + '"]');
+        buttons.forEach(btn => {
+            btn.style.background = '#e5e7eb';
+            btn.style.color = '#374151';
+        });
+        e.target.style.background = '#3b82f6';
+        e.target.style.color = '#fff';
+
+        // Update contents
+        const contents = document.querySelectorAll('.tab-content[data-card="' + cardId + '"]');
+        contents.forEach(c => c.style.display = 'none');
+        const target = document.querySelector('.tab-content[data-card="' + cardId + '"][data-tab="' + tabId + '"]');
+        if (target) target.style.display = 'block';
+    }
+});
+</script>
+</body>
+</html>
